@@ -30,7 +30,7 @@ export class PoseAdapter {
             }
 
             // 2. DETECTION
-            const threshold = 50; // How many pixels you have to move to trigger
+            const threshold = 30; // How many pixels you have to move to trigger
 
             if (nose.y < this.baselineY - threshold) {
                 this.action = "JUMP";
