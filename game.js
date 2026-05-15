@@ -28,6 +28,14 @@ const jumpStrength = 15;
 let isJumping = false;
 let isDucking = false;
 
+// --- Audio Setup ---
+const bgMusic = new Audio('loop for game.mp3');
+bgMusic.loop = true;
+bgMusic.volume = 0.5; // 0.0 to 1.0 (50% volume is a safe starting point)
+
+// We need a flag to track if the music has successfully started
+let musicStarted = false;
+
 // Tunnel effect state
 let tunnelSquares = [1000, 800, 600, 400, 200];
 
@@ -103,6 +111,8 @@ const loop = GameLoop({
 
         if (isGameOver) {
             if (isTryingToJump || keyPressed('space')) {
+            bgMusic.pause();
+            if (keyPressed('space')) {
                 // Restart Game
                 obstacles = [];
                 score = 0;
@@ -111,8 +121,19 @@ const loop = GameLoop({
                 playerY = 0;
                 velocityY = 0;
                 isJumping = false;
+                bgMusic.currentTime = 0;
+                bgMusic.play();
             }
             return;
+        }
+
+        if (!musicStarted && (keyPressed('space') || keyPressed('up') || keyPressed('w') || keyPressed('down') || keyPressed('s'))) {
+            bgMusic.play().then(() => {
+                musicStarted = true;
+            }).catch(err => {
+                // Catch any browser errors if it still blocks it
+                console.log("Browser blocked audio playback:", err);
+            });
         }
 
         score++;
