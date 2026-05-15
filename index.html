@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>1st Person Dino Runner</title>
@@ -27,7 +31,7 @@
 <canvas id="game" width="800" height="500"></canvas>
 
 <script src="https://unpkg.com/kontra/kontra.min.js"></script>
-<script src="game.js"></script>
+<script type="module" src="game.js"></script>
 
 </body>
 </html>

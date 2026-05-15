@@ -1,58 +1,44 @@
-import { InputAdapter } from "../../../core/input/input-adapter.js";
-import { poseService } from "../../../core/input/pose-service.js";
-import { SQUASH_ACTIONS } from "../actions.js";
+import { poseService } from "./pose-service.js";
 
-export class SquashPoseAdapter extends InputAdapter {
+export class PoseAdapter {
     constructor() {
-        super();
-        this.canvas = null;
+        this.baselineY = null;
+        this.action = "NEUTRAL"; // This is what the game will read
     }
 
-    onStart(canvas) {
-        this.canvas = canvas; // Save reference
-        this.unsubscribe = poseService.subscribe((poses) => {
-            this.analyzePose(poses);
+    start() {
+        // This connects to the service you sent me
+        poseService.subscribe((poses) => {
+            this.analyze(poses);
         });
     }
 
-    onStop() {
-        if (this.unsubscribe) this.unsubscribe();
-    }
+    analyze(poses) {
+        const body = poses[0];
+        if (!body) return;
 
-    analyzePose(poses) {
-        if (!this.canvas) return;
+        const nose = body.keypoints.find(k => k.name === 'nose');
 
-        const playerBody = poses[0];
-        if (!playerBody) return;
+        // nose.score > 0.5 ensures the AI is confident it actually sees you
+        if (nose && nose.score > 0.5) {
 
-        const nose = playerBody.keypoints.find(k => k.name === 'nose');
+            // 1. CALIBRATION
+            // The first time the AI sees you, it remembers where your nose is.
+            if (this.baselineY === null) {
+                this.baselineY = nose.y;
+                return;
+            }
 
-        if (nose && nose.score > 0.3) {
+            // 2. DETECTION
+            const threshold = 50; // How many pixels you have to move to trigger
 
-            // 1. Normalize Coordinates (0.0 to 1.0)
-            // MoveNet usually returns pixels relative to the video feed (640x480)
-            // We convert to % so we can map to ANY game resolution
-            let normX = nose.x / 640;
-            let normY = nose.y / 480;
-
-            // 2. Mirroring (Flip X)
-            // Because a webcam feels like a mirror
-            normX = 1.0 - normX;
-
-            // 3. Map to Game Canvas Size (800x600)
-            let gameX = normX * this.canvas.width;
-            let gameY = normY * this.canvas.height;
-
-            // 4. Clamp (Keep inside bounds)
-            // Keeps the sprite fully on screen (assuming 40px width sprite)
-            const padding = 20;
-            gameX = Math.max(padding, Math.min(this.canvas.width - padding, gameX));
-            gameY = Math.max(padding, Math.min(this.canvas.height - padding, gameY));
-
-            this.emit(SQUASH_ACTIONS.MOVE, {
-                x: gameX,
-                y: gameY
-            });
+            if (nose.y < this.baselineY - threshold) {
+                this.action = "JUMP";
+            } else if (nose.y > this.baselineY + threshold) {
+                this.action = "DUCK";
+            } else {
+                this.action = "NEUTRAL";
+            }
         }
     }
 }
