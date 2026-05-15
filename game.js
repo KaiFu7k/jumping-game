@@ -110,9 +110,8 @@ const loop = GameLoop({
         const isTryingToDuck = keyPressed('arrowdown') || keyPressed('s') || myInput.action === "DUCK";
 
         if (isGameOver) {
-            if (isTryingToJump || keyPressed('space')) {
             bgMusic.pause();
-            if (keyPressed('space')) {
+            if (isTryingToJump || keyPressed('space')) {
                 // Restart Game
                 obstacles = [];
                 score = 0;
@@ -123,8 +122,8 @@ const loop = GameLoop({
                 isJumping = false;
                 bgMusic.currentTime = 0;
                 bgMusic.play();
+                return;
             }
-            return;
         }
 
         if (!musicStarted && (keyPressed('space') || keyPressed('up') || keyPressed('w') || keyPressed('down') || keyPressed('s'))) {
