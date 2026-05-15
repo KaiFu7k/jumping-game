@@ -151,7 +151,7 @@ const loop = GameLoop({
 
         // --- Obstacle Logic ---
         frameCount++;
-        if (frameCount % 60 === 0) {
+        if (frameCount % 90 === 0) {
             spawnObstacle();
             frameCount = 0;
         }
@@ -163,7 +163,7 @@ const loop = GameLoop({
             if (obs.z < 60 && obs.z > -20) {
                 if (Math.abs(obs.offsetX) < 60) {
                     if (obs.type === 'cactus') {
-                        if (Math.abs(playerY) < obs.baseH * 0.8) {
+                        if (Math.abs(playerY) < obs.baseH * 0.5) {
                             isGameOver = true;
                         }
                     } else if (obs.type === 'bird') {
@@ -239,7 +239,7 @@ const loop = GameLoop({
             context.fillText('GAME OVER', centerX, centerY - 20);
             context.fillStyle = 'white';
             context.font = '20px Courier New';
-            context.fillText('Press SPACE or JUMP to restart', centerX, centerY + 30);
+            context.fillText('Press JUMP to restart', centerX, centerY + 30);
             context.textAlign = 'left';
         }
     }
